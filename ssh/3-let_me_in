@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Appends the school public key string to the authorized_keys file on the server
+
+ssh-copy-id -i ~/.ssh/school.pub ubuntu@44.208.165.196
