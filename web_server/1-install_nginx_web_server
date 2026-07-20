@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Script that configures a new Ubuntu machine by installing Nginx
+
+# Update package list and install nginx
+apt-get update -y
+apt-get install nginx -y
+
+# Create a simple HTML page with the required content
+echo "Holberton School" > /var/www/html/index.html
+
+# Ensure nginx is listening on port 80 (default configuration)
+# Start nginx service
+service nginx start
