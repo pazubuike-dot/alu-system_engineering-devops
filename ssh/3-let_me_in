@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 # Appends the school public key string to the authorized_keys file on the server
 
-ssh-copy-id -i school.pub ubuntu@44.208.165.196
+cat school.pub | ssh -o StrictHostKeyChecking=no -i school ubuntu@44.208.165.196 "cat >> ~/.ssh/authorized_keys"
