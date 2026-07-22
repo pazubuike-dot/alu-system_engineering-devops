@@ -8,7 +8,7 @@ apt-get install -y nginx
 # Create the custom 404 HTML file with the exact required text string
 echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
 
-# Overwrite or safely configure the default site block with the error_page directive
+# Write the complete clean configuration to the default site block
 cat << 'EOF' > /etc/nginx/sites-available/default
 server {
     listen 80 default_server;
@@ -30,6 +30,6 @@ server {
 }
 EOF
 
-# Test Nginx configuration and restart service
+# Test configuration and restart Nginx
 sudo nginx -t
 sudo service nginx restart
