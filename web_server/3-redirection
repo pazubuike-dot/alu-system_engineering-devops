@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # Script that configures Nginx to perform a 301 redirect for /redirect_me
 
-# Ensure Nginx is installed and running
+# Update and install Nginx
 apt-get update -y
 apt-get install -y nginx
 
-# Add the redirection rule to the default Nginx site configuration block
-# We use sed to insert 'rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' or 'return 301' inside the server block
-sudo sed -i "s|server {|server \\\n\tlocation /redirect_me {\n\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}|" /etc/nginx/sites-available/default
+# Insert the redirection block right after "listen 80 default_server;" in the default site config
+sudo sed -i '/listen 80 default_server;/a \\n\tlocation /redirect_me {\n\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}' /etc/nginx/sites-available/default
 
 # Test configuration and restart nginx
-service nginx restart
+sudo service nginx restart
