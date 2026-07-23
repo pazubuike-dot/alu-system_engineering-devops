@@ -3,18 +3,18 @@
 # Ignore SC2154 for shellcheck
 # shellcheck disable=SC2154
 
-# Install and update Nginx
+# Update package lists and install Nginx
 apt-get -y update
 apt-get -y install nginx
 
-# Add custom response header with the server hostname
-HOST_NAME=$(hostname)
-HEADER="\n\tadd_header X-Served-By $HOST_NAME;\n"
-FIND=$(grep "X-Served-By" /etc/nginx/sites-available/default)
+# Get the server hostname and add the custom response header
+HOSTNAME=$(hostname)
+CONFIG_FILE="/etc/nginx/sites-available/default"
 
-if [[ -z $FIND ]]; then
-    sed -i "23i $HEADER" /etc/nginx/sites-available/default
+if ! grep -q "X-Served-By" "$CONFIG_FILE"; then
+    sudo sed -i "s/server_name _;/server_name _;\n\tadd_header X-Served-By $HOSTNAME;/" "$CONFIG_FILE"
 fi
 
-# Restart Nginx to apply changes
+# Test configuration and restart Nginx
+nginx -t
 sudo service nginx restart
