@@ -2,3 +2,4 @@
 # Configure Apache to return Hello Holberton and start it
 echo "Hello Holberton" > /var/www/html/index.html
 service apache2 restart
+echo "apache2 is running"
