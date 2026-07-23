@@ -1,23 +1,17 @@
 #!/usr/bin/env bash
-# Configure Nginx to add a custom X-Served-By header containing the server's hostname.
+# Configure Nginx to have a custom HTTP response header
 # Ignore SC2154 for shellcheck
 # shellcheck disable=SC2154
 
-# Update and install nginx
 apt-get update -y
 apt-get install -y nginx
 
-# Get the server hostname
-HOSTNAME=$(hostname)
+HOST_NAME=$(hostname)
+HEADER="\n\tadd_header X-Served-By $HOST_NAME;"
+FIND=$(grep "X-Served-By" /etc/nginx/sites-available/default)
 
-# Path to default Nginx site configuration
-CONFIG_FILE="/etc/nginx/sites-available/default"
-
-# Add the header inside the server block if it doesn't already exist
-if ! grep -q "X-Served-By" "$CONFIG_FILE"; then
-    sed -i "s/server_name _;/server_name _;\n\tadd_header X-Served-By $HOSTNAME;/" "$CONFIG_FILE"
+if [[ -z $FIND ]]; then
+    sudo sed -i "23i $HEADER" /etc/nginx/sites-available/default
 fi
 
-# Test configuration and restart Nginx
-nginx -t
-service nginx restart
+sudo service nginx restart
