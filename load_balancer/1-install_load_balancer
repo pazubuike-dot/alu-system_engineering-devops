@@ -1,28 +1,30 @@
 #!/usr/bin/env bash
-# Install and configure HAproxy on lb-01 with roundrobin load balancing for web-01 and web-02
-# Ignore SC2154 for shellcheck
-# shellcheck disable=SC2154
+# Install and configure HAproxy load balancer
 
-# Update package list and install HAProxy
-apt-get update -y
+# Update package list and install HAproxy
+apt-get update
 apt-get install -y haproxy
 
-# Configure HAProxy configuration file
-cat << 'EOF' >> /etc/haproxy/haproxy.cfg
+# Backup original config
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
 
-frontend hbs-frontend
+# Configure HAproxy
+cat >> /etc/haproxy/haproxy.cfg <<EOF
+
+frontend http_front
     bind *:80
     mode http
-    default_backend hbs-backend
+    default_backend http_back
 
-backend hbs-backend
+backend http_back
     balance roundrobin
-    server 7076-web-01 98.94.66.221:80 check
-    server 7076-web-02 3.82.152.52:80 check
+    mode http
+    server web-01 98.94.66.221:80 check
+    server web-02 3.82.152.52:80 check
 EOF
 
-# Enable HAProxy to be managed via its init script / service
-sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
+# Enable HAproxy init script
+echo "ENABLED=1" > /etc/default/haproxy
 
-# Restart HAProxy to apply the configuration
+# Restart HAproxy
 service haproxy restart
