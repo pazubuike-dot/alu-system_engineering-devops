@@ -38,3 +38,5 @@ EOF
 
 # Restart haproxy via the init script to apply the new configuration
 service haproxy restart
+
+exit 0
