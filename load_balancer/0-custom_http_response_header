@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Configures Nginx to match web-01 fully, plus a custom X-Served-By header
+# Configuring nginx to match web-01 fully, plus a custom X-Served-By header
 # shellcheck disable=SC2154
 
 apt-get update 
