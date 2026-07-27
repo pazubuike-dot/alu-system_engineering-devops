@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Configures Nginx to match web-01 fully, plus a custom X-Served-By header
+# shellcheck disable=SC2154
+
+apt-get update 
+apt-get install -y nginx 
+
+echo "Holberton School" | tee /var/www/html/index.html
+
+new_str="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4 permanent;"
+
+sed -i "s/server_name _;/$new_str/" /etc/nginx/sites-available/default
+
+echo "Ceci n'est pas une page" | tee /var/www/html/404.html
+
+new_str="listen 80 default_server;\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\troot \/var\/www\/html;\n\tinternal;\n\t}"
+
+sed -i "s/listen 80 default_server;/$new_str/" /etc/nginx/sites-available/default
+
+sed -i "/server_name _;/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-available/default
+
+nginx -t
+
+service nginx restart
