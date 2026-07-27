@@ -1,42 +1,29 @@
 #!/usr/bin/env bash
-# Installs and configures HAProxy to load balance traffic across web-01 and web-02
-# using a roundrobin algorithm, managed via an init script
+# Installs and configures HAProxy on web-01 and web-02 as a load balancer
 
-# shellcheck disable=SC2154
-
-# Install haproxy non-interactively
-export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y haproxy
 
-# Enable haproxy so the init script can manage it (sysvinit on Ubuntu 16.04)
-if [ -f /etc/default/haproxy ]; then
-    sed -i "s/ENABLED=0/ENABLED=1/" /etc/default/haproxy
-fi
+# Enable HAProxy to start
+sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
 
-# Write the HAProxy configuration
-cat > /etc/haproxy/haproxy.cfg << 'EOF'
-global
-    daemon
-    maxconn 256
+# Back up the original config just in case
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 
-defaults
-    mode http
-    timeout connect 5000ms
-    timeout client 50000ms
-    timeout server 50000ms
+# Append the frontend/backend configuration
+cat >> /etc/haproxy/haproxy.cfg << EOF
 
-frontend http-in
-    bind *:80
-    default_backend web_servers
+frontend http_front
+	bind *:80
+	stats uri /haproxy?stats
+	default_backend http_back
 
-backend web_servers
-    balance roundrobin
-    server web-01 98.94.66.221:80 check
-    server web-02 3.82.152.52:80 check
+backend http_back
+	balance roundrobin
+	server web-01 98.94.66.221:80 check
+	server web-02 3.82.152.52:80 check
 EOF
 
-# Restart haproxy via the init script to apply the new configuration
 service haproxy restart
 
 exit 0
